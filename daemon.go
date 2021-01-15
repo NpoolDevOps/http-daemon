@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, error, int)
+type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, string, int)
 
 type HttpRouter struct {
 	Location string
@@ -58,6 +58,7 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
+
 	response(w, struct{}{}, fmt.Errorf("unknown request %v", req.URL), -3)
 }
 
