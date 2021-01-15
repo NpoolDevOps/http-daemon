@@ -53,7 +53,7 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 	for _, r := range routerTable {
 		if r.Location == req.URL.Path {
 			resp, msg, code := r.Handler(w, req)
-			msgErr := errors.New(msg)
+			msgErr := errors.New(string(msg))
 			err = response(w, resp, msgErr, code)
 			if nil != err {
 				log.Printf("fail to response %v", req.URL)
