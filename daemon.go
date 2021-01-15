@@ -8,9 +8,7 @@ import (
 	"net/http"
 )
 
-type Message string
-
-type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, Message, int)
+type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, string, int)
 
 type HttpRouter struct {
 	Location string
@@ -20,20 +18,16 @@ type HttpRouter struct {
 var routerTable []HttpRouter = make([]HttpRouter, 0)
 
 type ApiResp struct {
-	Code  int         `json:"code"`
-	Error string      `json:"error"`
-	Body  interface{} `json:"body"`
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Body interface{} `json:"body"`
 }
 
-func response(w http.ResponseWriter, resp interface{}, err error, code int) error {
-	errStr := ""
-	if nil != err {
-		errStr = err.Error()
-	}
+func response(w http.ResponseWriter, resp interface{}, msg string, code int) error {
 	apiResp := ApiResp{
-		Code:  code,
-		Error: errStr,
-		Body:  resp,
+		Code: code,
+		Msg:  msg,
+		Body: resp,
 	}
 	jsonStr, err := json.Marshal(&apiResp)
 	if nil != err {
@@ -47,14 +41,13 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("request %v -> %v [%v]", req.RemoteAddr, req.URL, req.URL.Path)
 	if err := req.ParseForm(); nil != err {
 		log.Printf("fail to parse form %v", req.URL)
-		response(w, struct{}{}, err, -1)
+		response(w, struct{}{}, err.Error(), -1)
 		return
 	}
 	for _, r := range routerTable {
 		if r.Location == req.URL.Path {
 			resp, msg, code := r.Handler(w, req)
-			msgErr := errors.New(string(msg))
-			err := response(w, resp, msgErr, code)
+			err := response(w, resp, msg, code)
 			if nil != err {
 				log.Printf("fail to response %v", req.URL)
 			}
@@ -63,7 +56,7 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	response(w, struct{}{}, fmt.Errorf("unknown request %v", req.URL), -3)
+	response(w, struct{}{}, fmt.Sprintf("unknown request %v", req.URL), -3)
 }
 
 func Run(port int) error {
