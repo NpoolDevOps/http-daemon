@@ -8,7 +8,9 @@ import (
 	"net/http"
 )
 
-type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, string, int)
+type Message string
+
+type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, Message, int)
 
 type HttpRouter struct {
 	Location string
