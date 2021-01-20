@@ -1,4 +1,4 @@
-package httphelper
+package httpdaemon
 
 import (
 	"encoding/json"
