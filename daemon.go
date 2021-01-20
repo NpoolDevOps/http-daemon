@@ -1,4 +1,4 @@
-package httpdaemon
+package httphelper
 
 import (
 	"encoding/json"
@@ -13,6 +13,7 @@ type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, st
 type HttpRouter struct {
 	Location string
 	Handler  HttpHandler
+	Method string
 }
 
 var routerTable []HttpRouter = make([]HttpRouter, 0)
@@ -46,6 +47,10 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	for _, r := range routerTable {
 		if r.Location == req.URL.Path {
+			if r.Method != req.Method {
+				log.Printf("request method is %v, need %v", req.Method, r.Method)
+				return
+			}
 			resp, msg, code := r.Handler(w, req)
 			err := response(w, resp, msg, code)
 			if nil != err {
@@ -64,7 +69,7 @@ func Run(port int) error {
 
 	go func(port int) {
 		portStr := fmt.Sprintf(":%v", port)
-		log.Printf("start http daemon [%v]", portStr)
+		log.Printf("start http server [%v]", portStr)
 		for {
 			http.ListenAndServe(portStr, nil)
 		}
@@ -82,4 +87,16 @@ func RegisterRouter(router HttpRouter) error {
 	log.Printf("add router: %v", router.Location)
 	routerTable = append(routerTable, router)
 	return nil
+}
+
+func ValidateParams(keys []string, params map[string][]string) error {
+	var err error
+	for _, key := range keys {
+		if len(params[key]) == 0 || params[key][0] == "" {
+			err = errors.New("params are not matched or empty")
+			break
+		}
+	}
+
+	return err
 }
