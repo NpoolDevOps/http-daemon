@@ -13,7 +13,7 @@ type HttpHandler func(w http.ResponseWriter, req *http.Request) (interface{}, st
 type HttpRouter struct {
 	Location string
 	Handler  HttpHandler
-	Method string
+	Method   string
 }
 
 var routerTable []HttpRouter = make([]HttpRouter, 0)
