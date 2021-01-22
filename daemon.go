@@ -100,3 +100,15 @@ func ValidateParams(keys []string, params map[string][]string) error {
 
 	return err
 }
+
+func ParseResponseBody(resBody []byte) *ApiResp {
+	var unmar map[string]interface{}
+	_ = json.Unmarshal(resBody, &unmar)
+
+	parseRes := new(ApiResp)
+	parseRes.Code = int(unmar["code"].(float64))
+	parseRes.Msg = unmar["msg"].(string)
+	parseRes.Body = unmar["body"]
+
+	return parseRes
+}
