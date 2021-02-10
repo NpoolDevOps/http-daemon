@@ -106,8 +106,13 @@ func ParseResponseBody(resBody []byte) *ApiResp {
 	_ = json.Unmarshal(resBody, &unmar)
 
 	parseRes := new(ApiResp)
+
 	parseRes.Code = int(unmar["code"].(float64))
-	parseRes.Msg = unmar["msg"].(string)
+	if _, ok := unmar["msg"]; ok {
+		parseRes.Msg = unmar["msg"].(string)
+	} else {
+		parseRes.Msg = unmar["error"].(string)
+	}
 	parseRes.Body = unmar["body"]
 
 	return parseRes
