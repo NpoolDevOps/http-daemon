@@ -15,13 +15,13 @@ func R() *resty.Request {
 func ParseResponse(resp *resty.Response) (*ApiResp, error) {
 	apiResp, err := ParseResponseBody(resp.Body())
 	if err != nil {
-		log.Errorf(log.Fields{}, "< exchange api response error %v [%v] (%v)",
+		log.Errorf(log.Fields{}, "< api response parse error %v [%v] (%v)",
 			resp.Request.URL, resp.Request.QueryParam, err)
 		return nil, err
 	}
 
 	if apiResp.Code != 0 {
-		log.Errorf(log.Fields{}, "< exchange key error %v [%v] (%v)",
+		log.Errorf(log.Fields{}, "< api response error %v [%v] (%v)",
 			resp.Request.URL, resp.Request.QueryParam, apiResp.Msg)
 		return nil, fmt.Errorf("%v (%v)", apiResp.Msg, apiResp.Code)
 	}
