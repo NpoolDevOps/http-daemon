@@ -101,19 +101,32 @@ func ValidateParams(keys []string, params map[string][]string) error {
 	return err
 }
 
-func ParseResponseBody(resBody []byte) *ApiResp {
+func ParseResponseBody(resBody []byte) (*ApiResp, error) {
 	var unmar map[string]interface{}
 	_ = json.Unmarshal(resBody, &unmar)
 
 	parseRes := new(ApiResp)
 
+	if _, ok := unmar["code"]; !ok {
+		return nil, errors.New("invalid api response")
+	}
 	parseRes.Code = int(unmar["code"].(float64))
+
+	_, ok1 := unmar["msg"]
+	_, ok2 := unmar["error"]
+	if !ok1 && !ok2 {
+		return nil, errors.New("invalid api response")
+	}
+
 	if _, ok := unmar["msg"]; ok {
 		parseRes.Msg = unmar["msg"].(string)
 	} else {
 		parseRes.Msg = unmar["error"].(string)
 	}
-	parseRes.Body = unmar["body"]
 
-	return parseRes
+	if _, ok := unmar["body"]; ok {
+		parseRes.Body = unmar["body"]
+	}
+
+	return parseRes, nil
 }
