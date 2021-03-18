@@ -80,11 +80,11 @@ func Run(port int) error {
 
 func RegisterRouter(router HttpRouter) error {
 	for _, r := range routerTable {
-		if r.Location == router.Location {
+		if r.Location == router.Location && r.Method == router.Method {
 			return errors.New("router already exist")
 		}
 	}
-	log.Printf("add router: %v", router.Location)
+	log.Printf("add router: %v %v", router.Location, router.Method)
 	routerTable = append(routerTable, router)
 	return nil
 }
