@@ -49,6 +49,7 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 		if r.Location == req.URL.Path {
 			if r.Method != req.Method {
 				log.Printf("request method is %v, need %v", req.Method, r.Method)
+				response(w, struct{}{}, fmt.Sprintf("request method is %v, need %v", req.Method, r.Method), -3)
 				return
 			}
 			resp, msg, code := r.Handler(w, req)
@@ -61,7 +62,7 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	response(w, struct{}{}, fmt.Sprintf("unknown request %v", req.URL), -3)
+	response(w, struct{}{}, fmt.Sprintf("unknown request %v", req.URL), -4)
 }
 
 func Run(port int) error {
