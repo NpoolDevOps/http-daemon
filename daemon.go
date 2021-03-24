@@ -46,23 +46,22 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	for _, r := range routerTable {
-		if r.Location == req.URL.Path {
-			if r.Method != req.Method {
-				log.Printf("request method is %v, need %v", req.Method, r.Method)
-				response(w, struct{}{}, fmt.Sprintf("request method is %v, need %v", req.Method, r.Method), -3)
-				return
-			}
-			resp, msg, code := r.Handler(w, req)
-			err := response(w, resp, msg, code)
-			if nil != err {
-				log.Printf("fail to response %v", req.URL)
-			}
-
-			return
+		if r.Location != req.URL.Path {
+			continue
 		}
+		if r.Method != req.Method {
+			continue
+		}
+		resp, msg, code := r.Handler(w, req)
+		err := response(w, resp, msg, code)
+		if nil != err {
+			log.Printf("fail to response %v", req.URL)
+		}
+
+		return
 	}
 
-	response(w, struct{}{}, fmt.Sprintf("unknown request %v", req.URL), -4)
+	response(w, struct{}{}, fmt.Sprintf("invalid request %v / %v", req.URL, req.Method), -4)
 }
 
 func Run(port int) error {
