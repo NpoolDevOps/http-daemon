@@ -39,7 +39,7 @@ func response(w http.ResponseWriter, resp interface{}, msg string, code int) err
 }
 
 func rootHandler(w http.ResponseWriter, req *http.Request) {
-	log.Printf("request %v -> %v [%v]", req.RemoteAddr, req.URL, req.URL.Path)
+	log.Printf("request %v %v -> %v [%v]", req.RemoteAddr, req.Method, req.URL, req.URL.Path)
 	if err := req.ParseForm(); nil != err {
 		log.Printf("fail to parse form %v", req.URL)
 		response(w, struct{}{}, err.Error(), -1)
